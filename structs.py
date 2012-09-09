@@ -20,7 +20,7 @@ event_opcode = Enum(Byte('event_opcode'),
                     )
 
 
-event_status = Enum(Byte('event_status'),
+event_status = Enum(Byte('status'),
                     success = 0x00,
                     disallowed = 0x0c,
                     )
@@ -39,7 +39,7 @@ test_pattern = Enum(Byte('test_pattern'),
 param_len = OneOf(Byte("param_len"), range(0, 256))
 channel = OneOf(Byte("channel"), range(0,40))
 
-event_status_struct = Struct("event_status",
+event_status_struct = Struct("status",
                              event_status,
                              )
 							

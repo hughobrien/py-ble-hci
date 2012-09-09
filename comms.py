@@ -2,18 +2,16 @@ import serial
 import utils
 import structs
 
-#SERIAL_PORT = "/dev/ttyACM0"
-SERIAL_PORT = "\\.\COM6"
-
-def setup_serial_port():
+def setup_serial_port(port_path):
     port = serial.Serial()
-    port.port = SERIAL_PORT
+    port.port = port_path
     port.baudrate = 57600 #specs from TI LE PTM guide
     port.rtscts = True
     port.parity = serial.PARITY_NONE
     port.bytesize = serial.EIGHTBITS
     port.stopbits = serial.STOPBITS_ONE
     port.timeout = None #0 = non-blocking mode
+    port.rxing = False #simple blocking system
     port.last_rx = ''
     port.last_tx = ''
     return port
@@ -23,7 +21,7 @@ def reader(port):
         data = ''
         length = 0
         
-        data = data + port.read(1)
+        data = port.read(1) #blocks here
         
         if data == '\x04': #event pkt
             data = data + port.read(1) #event opcode, un-needed
@@ -35,8 +33,10 @@ def reader(port):
                 data = data + port.read(1) #the rest
 
             port.last_rx = data
-            print "\n\nGot: %s\n%s" % (utils.pretty(data), repr(structs.parse(data)))
+            print "Got: %s\n%s" % (utils.pretty(data), repr(structs.parse(data)))
 
         else:
-            print "Non event packet, %s. Aborting read loop" % data
+            print "Non event packet, %s. Aborting read loop." % data
+
+        port.rxing = False #unblock
             
