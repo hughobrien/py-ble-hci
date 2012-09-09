@@ -1,8 +1,8 @@
 import serial
-import utils
 import structs
+from utils import pretty
 
-def setup_serial_port(port_path):
+def setup_serial_port(port_path,debug_level=0):
     port = serial.Serial()
     port.port = port_path
     port.baudrate = 57600 #specs from TI LE PTM guide
@@ -12,12 +12,18 @@ def setup_serial_port(port_path):
     port.stopbits = serial.STOPBITS_ONE
     port.timeout = None #0 = non-blocking mode
     port.rxing = False #simple blocking system
+    port.debug_level = debug_level
     port.last_rx = ''
     port.last_tx = ''
+
+    port.close() #sanity
+    port.open()
     return port
 
 def reader(port):
-    while port.isOpen():
+
+    
+    while True:
         data = ''
         length = 0
         
@@ -33,10 +39,19 @@ def reader(port):
                 data = data + port.read(1) #the rest
 
             port.last_rx = data
-            print "Got: %s\n%s" % (utils.pretty(data), repr(structs.parse(data)))
+            
+            if port.debug_level == 2:
+                print "Got:  %s\n%s" % (pretty(data), repr(structs.parse(data)))
+            elif port.debug_level == 1:
+                print "Got:  %s" % pretty(data)
+            else:
+                pass
 
+        elif data == '':
+            break #port closed perhaps? Timeout set? Thread dies here.
+                    
         else:
-            print "Non event packet, %s. Aborting read loop." % data
+            print "Non event packet, %s. Aborting read loop." % pretty(data)
 
         port.rxing = False #unblock
             
