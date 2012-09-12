@@ -6,19 +6,14 @@ from time import sleep
 #dongle = "/dev/ttyACM0" #posix style
 #dongle = "\\.\COM5" #nt style
 
-#dongle = sys.argv[1]
-#tcp_port = int(sys.argv[2])
-
-#Now using find_dongle to catch renumerations from full resets
-#This works well when only a single dongle is present on the system
+dongle = sys.argv[1]
+tcp_port = int(sys.argv[2])
 
 while True:
 
-    tcp_port = 2347
+    comms.reset_dongle(dongle)
 
-    comms.reset_dongle(comms.find_dongle())
-
-    port = comms.setup_serial_port(comms.find_dongle(), debug=True)
+    port = comms.setup_serial_port(dongle, debug=True)
     port.socket = comms.start_server(tcp_port=tcp_port)
 
     read_thread = threading.Thread(target=comms.reader, args=(port,))
