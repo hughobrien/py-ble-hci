@@ -97,6 +97,7 @@ def open_socket(host, tcp_port, debug=False):
         return sock
 
 def find_dongle(): #posix servers only
+    sleep(2) #settling time
     matches = []
     for port in list_ports.grep('ACM'):
         matches.append(port[0])
