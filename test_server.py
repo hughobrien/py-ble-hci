@@ -1,14 +1,16 @@
 import sys
 import comms
 import threading
-from scripting import reset_dongle
 from time import sleep
 
 #dongle = "/dev/ttyACM0" #posix style
 #dongle = "\\.\COM5" #nt style
 
-dongle = sys.argv[1]
-tcp_port = int(sys.argv[2])
+#dongle = sys.argv[1]
+#tcp_port = int(sys.argv[2])
+
+dongle = comms.find_dongle()
+tcp_port = 2347
 
 while True:
     port = comms.setup_serial_port(dongle, debug=True)

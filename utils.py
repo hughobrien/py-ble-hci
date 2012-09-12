@@ -34,7 +34,7 @@ def print_container(cont,indent=0):
 def dict_to_csv(data, dest):
     out = ''
     for i in data:
-        out = out + repr(i) + ',' + repr(data[i]) + '\n'
+        out = out + str(i) + ',' + str(data[i]) + '\n'
 
     cleanout = out.replace(' ', '')\
                .replace('[', '')\

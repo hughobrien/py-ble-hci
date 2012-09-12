@@ -2,6 +2,7 @@ import serial
 import socket
 import threading
 from utils import pretty
+from serial.tools import list_ports
 
 def setup_serial_port(port_path, socket=None, debug=False):
     port = serial.Serial()
@@ -92,3 +93,13 @@ def open_socket(host, tcp_port, debug=False):
         sock.debug = debug
         sock.connect((host, tcp_port))
         return sock
+
+def find_dongle(): #posix servers only
+    matches = []
+    for port in list_ports.grep('ACM'):
+        matches.append(port[0])
+
+    if len(matches) != 1:
+        print "Multiple Dongles Found"
+
+    return matches[0]

@@ -15,22 +15,18 @@ do_cmd(transmitter, 'le_reset')
 do_cmd(receiver, 'le_reset')
 sleep(2)
 
-
-pattern = 'psn9'
-length = 10
-
 results = {}
 
-for channel in range(0,40):
+for length in [0, 1, 2, 3, 5, 10, 15, 20, 25, 30, 35, 37]:
     counts = []
-    for i in range(0,9):
-        do_rx(receiver, channel=channel)
-        do_tx(transmitter, channel=channel, payload_len=length, pattern=pattern)
+    for i in range(0,10):
+        do_rx(receiver)
+        do_tx(transmitter, payload_len=length)
         sleep(5)
         do_test_end(transmitter)
         counts.append(do_test_end(receiver))
-
-    results[channel] = counts
+        
+    results[length] = counts
 
 transmitter.close()
 receiver.close()
