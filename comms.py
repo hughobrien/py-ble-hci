@@ -4,6 +4,7 @@ import threading
 from utils import pretty
 from serial.tools import list_ports
 from time import sleep
+from scripting import do_cmd
 
 def setup_serial_port(port_path, socket=None, debug=False):
     port = serial.Serial()
@@ -109,8 +110,8 @@ def reset_dongle(dongle):
         """Performs full HW reset, seems to trigger an OS re-enumeration
         of the serial device, which means the old handle (e.g. COM1) changes,
         but only sometimes..."""
-        port = comms.setup_serial_port(dongle)
-        read_thread = threading.Thread(target=comms.reader, args=(port,))
+        port = setup_serial_port(dongle)
+        read_thread = threading.Thread(target=reader, args=(port,))
         read_thread.start()
         do_cmd(port, 'util_reset')
         port.close()

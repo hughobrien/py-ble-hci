@@ -34,5 +34,4 @@ while True:
 
     read_thread.join() #read terminates on serial port close
 
-    sleep(2)
     #up the spout again...
