@@ -15,17 +15,25 @@ do_cmd(transmitter, 'le_reset')
 do_cmd(receiver, 'le_reset')
 sleep(2)
 
-packet_counters = []
-for length in [0, 15, 30]:
-    do_rx(receiver, channel=37)
-    do_tx(transmitter, channel=37, pattern='z1111', payload_len=length)
 
-    sleep(3)
+pattern = 'psn9'
+length = 10
 
-    do_test_end(transmitter)
-    packet_counters.append(do_test_end(receiver))
+results = {}
+
+for channel in range(0,40):
+    counts = []
+    for i in range(0,9):
+        do_rx(receiver, channel=channel)
+        do_tx(transmitter, channel=channel, payload_len=length, pattern=pattern)
+        sleep(5)
+        do_test_end(transmitter)
+        counts.append(do_test_end(receiver))
+
+    results[channel] = counts
 
 transmitter.close()
 receiver.close()
 
-print packet_counters
+dict_to_csv(results, 'data.csv')
+print results

@@ -30,3 +30,16 @@ def print_container(cont,indent=0):
             print_container(cont[i], indent + 1)
         else:
             print "%s%s: %s" % (tabs, i, cont[i])
+
+def dict_to_csv(data, dest):
+    out = ''
+    for i in data:
+        out = out + repr(i) + ',' + repr(data[i]) + '\n'
+
+    cleanout = out.replace(' ', '')\
+               .replace('[', '')\
+               .replace(']', '')
+
+    f = open(dest, 'w')
+    f.write(cleanout)
+    f.close
