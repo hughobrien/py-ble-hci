@@ -1,9 +1,6 @@
-import comms
-import threading
 from utils import *
 from construct import Container
 from structs import build, parse
-from time import sleep
 
 def tx_container(channel=0, payload_len=10, test_pattern='psn9'):
         container = Container(
@@ -101,15 +98,3 @@ def do_test_end(port):
         container = cmd_container('test_end')
         build_write_check(port,container)
         return parse(port.last_rx).event_params.cmd_response.pkt_count
-     
-def reset_dongle(dongle):
-        """Performs full HW reset, seems to trigger an OS re-enumeration
-        of the serial device, which means the old handle (e.g. COM1) changes,
-        but only sometimes..."""
-        port = comms.setup_serial_port(dongle)
-        read_thread = threading.Thread(target=comms.reader, args=(port,))
-        read_thread.start()
-        do_cmd(port, 'util_reset')
-        port.close()
-        read_thread.join()
-        sleep(2)
