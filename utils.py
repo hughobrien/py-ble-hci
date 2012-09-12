@@ -20,3 +20,13 @@ def pretty(input):
         out = out + input[i].capitalize()
         a = a + 1
     return out
+
+def print_container(cont,indent=0):
+
+    tabs = "\t" * indent
+    for i in cont:
+        if cont[i].__class__.__name__ == 'Container':
+            print "%sContainer: %s" % (tabs, i)
+            print_container(cont[i], indent + 1)
+        else:
+            print "%s%s: %s" % (tabs, i, cont[i])

@@ -1,5 +1,7 @@
-from construct import *
+import comms
+import threading
 from utils import *
+from construct import Container
 from structs import build, parse
 from time import sleep
 
@@ -35,44 +37,57 @@ def cmd_container(opcode, cmd_params=[]):
                 cmd_params = cmd_params,
                 )
                 
+def write(data, target):
+        target.last_tx = data
+        if target.debug:
+                print "Sent: %s" % pretty(target.last_tx)
+        
+        if target.__class__.__name__ == 'Serial':
+                target.has_data.clear()
+                target.write(data)
+                target.has_data.wait()
                 
-def write(data,port,block=False):
-        port.last_tx = data
-        if port.debug_level > 0:
-                print "Sent: %s" % pretty(data)
-        port.write(data)
+        if target.__class__.__name__ == 'modSocket':
+                target.sendall(data)
+                target.last_rx = target.recv(1024)
 
-        if block:
-                port.rxing = True
-                while port.rxing == True:
-                        sleep(0.1)
-        
-        
+        if target.debug:
+                print "Got:  %s\n" % pretty(target.last_rx)
+         
 def hand_code(input,port):
         write(pack(input), port)
 
-def check_response(port):
+def check_response(port):      
+        
+        def chat():
+                if port.debug:
+                        print "Success"
+                        
         response = parse(port.last_rx)
+        
         if response.event_opcode == 'cmd_complete':
                 if response.event_params.cmd_response.status == 'success':
-                        if port.debug_level > 0:
-                                print "Success"
+                        chat()
                         return
-        print "Fault:\n%s" % repr(response)
+                                
+        if response.event_opcode == 'vendor_specific':
+                if response.event_params.vendor_event_opcode == 'cmd_status':
+                        if response.event_params.vendor_event_params.status == 'success':
+                                chat()
+                                return
+
+        print "Fault:"
+        print "%s" % pretty(port.last_rx)
+        print_container(response)
 
 def build_write_check(port,container):
         raw = build(container)
-        if port.debug_level == 2:
-                print container
-        write(raw,port,block=True)
+        write(raw, port)
         check_response(port)
 
 def do_cmd(port, opcode, data=[]):
         container = cmd_container(opcode, data)
-        raw = build(container)
-        if port.debug_level == 2:
-                print container
-        write(raw, port,block=True)
+        build_write_check(port, container)
         
 def do_tx(port,channel=0, payload_len=10, pattern='psn9'):
         container = tx_container(channel,payload_len,pattern)
@@ -80,12 +95,21 @@ def do_tx(port,channel=0, payload_len=10, pattern='psn9'):
         
 def do_rx(port,channel=0):
         container = rx_container(channel)
-        build_write_check(port,container)
+        build_write_check(port, container)
         
 def do_test_end(port):
         container = cmd_container('test_end')
         build_write_check(port,container)
         return parse(port.last_rx).event_params.cmd_response.pkt_count
-
-def do_reset(port):
+     
+def reset_dongle(dongle):
+        """Performs full HW reset, seems to trigger an OS re-enumeration
+        of the serial device, which means the old handle (e.g. COM1) changes,
+        but only sometimes..."""
+        port = comms.setup_serial_port(dongle)
+        read_thread = threading.Thread(target=comms.reader, args=(port,))
+        read_thread.start()
         do_cmd(port, 'util_reset')
+        port.close()
+        read_thread.join()
+        sleep(2)

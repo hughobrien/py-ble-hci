@@ -1,5 +1,4 @@
 from construct import *
-from utils import pack
 
 pkt_type = Enum(Byte('pkt_type'),
                 command = 1,
@@ -13,16 +12,24 @@ cmd_opcode = Enum(ULInt16('cmd_opcode'),
                   tx_test = 0x201e,
                   test_end = 0x201f,
                   util_reset = 0xfe80,
+                  le_reset = 0x0c03,
                   )
 
 event_opcode = Enum(Byte('event_opcode'),
                     cmd_complete = 0x0e,
+                    vendor_specific = 0xff,
                     )
 
 
 event_status = Enum(Byte('status'),
                     success = 0x00,
                     disallowed = 0x0c,
+                    )
+
+
+
+vendor_event_opcode = Enum(ULInt16('vendor_event_opcode'),
+                    cmd_status = 0x067f,
                     )
 
 test_pattern = Enum(Byte('test_pattern'),
@@ -42,6 +49,23 @@ channel = OneOf(Byte("channel"), range(0,40))
 event_status_struct = Struct("status",
                              event_status,
                              )
+
+vendor_cmd_status_struct = Struct("vendor_cmd_status_struct",
+                                  event_status,
+                                  cmd_opcode,
+                                  param_len,
+                                  MetaRepeater(lambda ctx: ctx["param_len"], Byte("data")) #most nested param_len
+                                  )
+
+vendor_event_struct = Struct("vendor_event",
+                             vendor_event_opcode,
+                             Switch("vendor_event_params", lambda ctx: ctx["vendor_event_opcode"],
+                                    {
+                                        "cmd_status": vendor_cmd_status_struct,
+                                        }
+                                    )
+                             )
+                             
 							
 test_end = Struct("test_end",
                   Embed(event_status_struct),
@@ -63,10 +87,9 @@ cmd_complete_struct = Struct("cmd_complete",
                                  cmd_opcode,
                                  Switch("cmd_response", lambda ctx: ctx["cmd_opcode"],
                                         {
-                                            "rx_test": event_status_struct,
-                                            "tx_test": event_status_struct,
                                             "test_end": test_end,
-                                            }
+                                            },
+                                        default = event_status_struct,
                                         )
                                  )
 
@@ -76,6 +99,7 @@ hci_event = Struct("hci_event",
                    Switch("event_params", lambda ctx: ctx["event_opcode"],
                           {
                               "cmd_complete":	cmd_complete_struct,
+                              "vendor_specific": vendor_event_struct,
                               }
                           )
                    )
