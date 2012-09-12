@@ -3,7 +3,6 @@ import socket
 import threading
 from utils import pretty
 from serial.tools import list_ports
-from time import sleep
 from scripting import do_cmd
 
 def setup_serial_port(port_path, socket=None, debug=False):
@@ -21,10 +20,6 @@ def setup_serial_port(port_path, socket=None, debug=False):
     port.socket = socket
     port.last_rx = ''
     port.last_tx = ''
-
-    if port.isOpen():
-        port.close()
-        sleep(2)
     
     port.open()
     return port
@@ -97,7 +92,6 @@ def open_socket(host, tcp_port, debug=False):
         return sock
 
 def find_dongle(): #posix servers only
-    sleep(2) #settling time
     matches = []
     for port in list_ports.grep('ACM'):
         matches.append(port[0])
@@ -117,4 +111,3 @@ def reset_dongle(dongle):
         do_cmd(port, 'util_reset')
         port.close()
         read_thread.join()
-        sleep(2)

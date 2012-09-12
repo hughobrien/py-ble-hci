@@ -1,18 +1,14 @@
 import sys
 import comms
 import threading
-from time import sleep
 
 #dongle = "/dev/ttyACM0" #posix style
 #dongle = "\\.\COM5" #nt style
 
-dongle = sys.argv[1]
+dongle = str(sys.argv[1])
 tcp_port = int(sys.argv[2])
 
 while True:
-
-    comms.reset_dongle(dongle)
-
     port = comms.setup_serial_port(dongle, debug=True)
     port.socket = comms.start_server(tcp_port=tcp_port)
 
@@ -27,5 +23,5 @@ while True:
     port.close()
 
     read_thread.join() #read terminates on serial port close
-
+    
     #up the spout again...
