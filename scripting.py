@@ -1,5 +1,5 @@
 from utils import *
-from construct import Container
+from construct import Container, MappingError
 from structs import build, parse
 
 def tx_container(channel=0, payload_len=10, test_pattern='psn9'):
@@ -59,8 +59,12 @@ def check_response(port):
         def chat():
                 if port.debug:
                         print "Success"
-                        
-        response = parse(port.last_rx)
+        try:
+                response = parse(port.last_rx)
+        except MappingError:
+                print "Fault:"
+                print "%s" % pretty(port.last_rx)
+                raise
         
         if response.event_opcode == 'cmd_complete':
                 if response.event_params.cmd_response.status == 'success':
@@ -73,9 +77,6 @@ def check_response(port):
                                 chat()
                                 return
 
-        print "Fault:"
-        print "%s" % pretty(port.last_rx)
-        print_container(response)
 
 def build_write_check(port,container):
         raw = build(container)

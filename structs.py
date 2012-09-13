@@ -24,6 +24,7 @@ event_opcode = Enum(Byte('event_opcode'),
 event_status = Enum(Byte('status'),
                     success = 0x00,
                     disallowed = 0x0c,
+                    role_change_not_allowed = 0x21,
                     )
 
 
@@ -132,4 +133,3 @@ def build(input):
 
 def parse(input):
     return hci_pkt.parse(input)
-    
