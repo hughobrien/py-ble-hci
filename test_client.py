@@ -11,27 +11,36 @@ rx_port = 2348
 transmitter = comms.open_socket(tx_host, tx_port)
 receiver = comms.open_socket(rx_host, rx_port)
 
-results = {}
+time_range = [5, 10, 20]
+length_range = [0, 15, 30]
+channel_range = [10, 25, 39]
+pattern_range = ['psn9', 'z1111', 'z1010']
+num_runs = 10
 
-for length in [30, 20, 10, 0]:
-    counts = []
-    for i in range(0,10):
-        do_rx(receiver)
-        do_tx(transmitter, payload_len=length)
-        
-        sleep(10)
-        
-        do_test_end(transmitter)
-        counts.append(do_test_end(receiver))
+pps = []
 
-        do_cmd(transmitter, 'le_reset')
-        do_cmd(receiver, 'le_reset')
-        
-    results[length] = counts
+for time in time_range:
+    for channel in channel_range:
+        for length in length_range:
+            for pattern in pattern_range:
+                for i in range(0,num_runs):
+                    
+                    do_rx(receiver, channel=channel)
+                    do_tx(transmitter, channel=channel, payload_len=length, pattern=pattern)
+
+                    sleep(time)
+            
+                    do_test_end(transmitter)
+                    count = do_test_end(receiver)
+
+                    do_cmd(transmitter, 'le_reset')
+                    do_cmd(receiver, 'le_reset')
+
+                    print "%ds on ch%d length %d ptrn %s run%d yielded %d packets" % (time, channel, length, pattern, i, count)
+                    rate = float(count) / float(time)
+                    pps.append(rate)
+                    print "%g packets per second" % rate
 
 
 transmitter.close()
 receiver.close()
-
-dict_to_csv(results, 'data.csv')
-print results
