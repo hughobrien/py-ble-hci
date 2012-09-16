@@ -1,15 +1,15 @@
 def pack(input):
-    """returns 'packed' aka hex encoded string of input e.g.
-    >>> pack("00 aa ff")
-        '\x00\xaa\xff' """
+    #returns 'packed' aka hex encoded string of input e.g.
+    #>>> pack("00 aa ff")
+    #    '\x00\xaa\xff' 
     return input\
            .replace(' ', '')\
            .replace('\n','')\
            .decode('hex')
 
 def pretty(input):
-    """ >>> pretty("\x01\x02\x03\xff")
-            '01 02 03 FF'"""
+    # >>> pretty("\x01\x02\x03\xff")
+    #       '01 02 03 FF'
     input = input.encode('hex')
     a=0
     out = ''
