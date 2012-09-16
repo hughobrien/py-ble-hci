@@ -44,8 +44,8 @@ test_pattern = Enum(Byte('test_pattern'),
                     z0101 = 7,
                     )
 
-param_len = OneOf(Byte("param_len"), range(0, 256))
-channel = OneOf(Byte("channel"), range(0,40))
+param_len = OneOf(Byte("param_len"), range(256))
+channel = OneOf(Byte("channel"), range(40))
 
 event_status_struct = Struct("status",
                              event_status,
@@ -79,7 +79,7 @@ rx_test_cmd_struct = Struct("rx_test",
 
 tx_test_cmd_struct = Struct("tx_test",
                         channel,
-                        OneOf(Byte("payload_len"), range(0,38)),
+                        OneOf(Byte("payload_len"), range(38)),
                         test_pattern,
                         )
 

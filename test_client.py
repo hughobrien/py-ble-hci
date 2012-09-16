@@ -23,7 +23,7 @@ for time in time_range:
     for channel in channel_range:
         for length in length_range:
             for pattern in pattern_range:
-                for i in range(0,num_runs):
+                for i in range(num_runs):
                     
                     do_rx(receiver, channel=channel)
                     do_tx(transmitter, channel=channel, payload_len=length, pattern=pattern)

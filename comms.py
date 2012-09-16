@@ -40,7 +40,7 @@ def reader(port):
             data = data + length #append it to stream
             length = ord(length) #get int
 
-            for i in range(0,length):
+            for i in range(length):
                 data = data + port.read(1) #the rest
 
             port.last_rx = data

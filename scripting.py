@@ -38,7 +38,8 @@ def write(data, target):
         target.last_tx = data
         if target.debug:
                 print "Sent: %s" % pretty(target.last_tx)
-        
+
+        #todo: replace with isinstance()
         if target.__class__.__name__ == 'Serial':
                 target.has_data.clear()
                 target.write(data)

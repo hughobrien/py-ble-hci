@@ -13,7 +13,7 @@ def pretty(input):
     input = input.encode('hex')
     a=0
     out = ''
-    for i in range(0, len(input)):
+    for i in range(len(input)):
         if a == 2:
             out = out + ' '
             a = 0
@@ -25,6 +25,7 @@ def print_container(cont,indent=0):
 
     tabs = "\t" * indent
     for i in cont:
+        #todo: replace with isinstance
         if cont[i].__class__.__name__ == 'Container':
             print "%sContainer: %s" % (tabs, i)
             print_container(cont[i], indent + 1)
