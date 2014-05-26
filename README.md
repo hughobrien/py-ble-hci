@@ -11,4 +11,6 @@ Made in order to control DTM sessions, but easily expandable to other HCI comman
 
 Built with a focus on the [Texas Instruments CC2540](http://processors.wiki.ti.com/index.php/Category:BluetoothLE) USB dongle, with the 'host_test_release' firmware which emulates a serial port when connected to a PC.
 
+Demo
+----
 ![demonstration run](https://raw.githubusercontent.com/hughobrien/py-ble-hci/master/demo_run.png)
