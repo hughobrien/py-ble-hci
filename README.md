@@ -9,8 +9,6 @@ Example image shows two servers controlled by one client.
 
 Made in order to control DTM sessions, but easily expandable to other HCI commands/events. Parser built from [construct](http://construct.wikispaces.com/) package, serial from [pyserial](http://pyserial.sourceforge.net/). __Both required to run__. I used construct 2.06 and pyserial 2.6 on python 2.7.3.
 
-Built with a focus on the Texas Instruments CC2540 USB dongle, with the 'host_test_release' firmware which emulates a serial port when connected to a PC.
-
-[CC2540 info](http://processors.wiki.ti.com/index.php/Category:BluetoothLE)
+Built with a focus on the [Texas Instruments CC2540](http://processors.wiki.ti.com/index.php/Category:BluetoothLE) USB dongle, with the 'host_test_release' firmware which emulates a serial port when connected to a PC.
 
 ![demonstration run](https://raw.githubusercontent.com/hughobrien/py-ble-hci/master/demo_run.png)
